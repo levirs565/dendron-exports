@@ -1,5 +1,10 @@
-import { Code, Effects, Extension, State } from "micromark-util-types";
-import { codes, markdownLineEnding, markdownLineEndingOrSpace } from "./utils.ts";
+import { Code, Effects, Extension, State, Event } from "micromark-util-types";
+import {
+  codes,
+  markdownLineEnding,
+  markdownLineEndingOrSpace,
+} from "./utils.ts";
+import { WikiLink } from "../engine/wikilink.ts";
 
 declare module "micromark-util-types" {
   export interface TokenTypeMap {
@@ -104,3 +109,43 @@ export const wikiLinkExtension: Extension = {
     },
   },
 };
+
+export class WikiLinkHandler {
+  link?: WikiLink;
+  datas: string[] = [];
+  inWikiLink = false;
+
+  on(event: Event): boolean {
+    if (
+      !this.inWikiLink &&
+      event[0] === "enter" &&
+      event[1].type === "wikiLink"
+    ) {
+      this.link = undefined;
+      this.inWikiLink = true;
+      return true;
+    } else if (this.inWikiLink) {
+      if (event[1].type === "wikiLink" && event[0] === "exit") {
+        if (this.datas.length == 2) {
+          this.link = {
+            title: this.datas[0],
+            target: this.datas[1],
+          };
+        } else {
+          this.link = {
+            target: this.datas[0],
+          };
+        }
+
+        this.datas = [];
+        this.inWikiLink = false;
+      } else if (event[1].type === "wikiLinkData" && event[0] === "enter") {
+        this.datas.push(event[2].sliceSerialize(event[1]));
+      }
+
+      return true;
+    }
+
+    return false;
+  }
+}

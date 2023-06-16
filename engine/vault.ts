@@ -13,10 +13,22 @@ export class Vault {
   async index() {
     for await (const file of Deno.readDir(this.folder)) {
       if (!file.isFile || !this.isNote(file.name)) continue;
-      const path = join(this.folder, file.name);
-      this.tree.add(parse(path), false);
+      const path = parse(join(this.folder, file.name));
+      const note = this.tree.add(path.name, false);
+      note.filePath = path;
     }
 
     this.tree.sort();
+  }
+
+  buildBacklinks() {
+    for (const note of this.tree.flatten()) {
+      for (const link of note.metadata.links) {
+        const target = this.tree.get(link.target);
+        if (!target) continue;
+
+        target.metadata.backlinks.push(note);
+      }
+    }
   }
 }

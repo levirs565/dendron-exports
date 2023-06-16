@@ -1,19 +1,19 @@
 import { ParsedPath } from "std/path/mod.ts";
-
-export interface NoteMetadata {
-  title?: string;
-}
+import { createBlankMetadata } from "./metadata.ts";
+import { Event } from "micromark-util-types";
 
 export class Note {
   name: string;
   children: Note[] = [];
-  filePath?: ParsedPath;
   parent?: Note;
-  title = "";
 
-  constructor(private originalName: string, private titlecase: boolean) {
+  filePath?: ParsedPath;
+  content?: string;
+  metadata = createBlankMetadata();
+  document: Event[] = [];
+
+  constructor(public originalName: string) {
     this.name = originalName.toLowerCase();
-    this.syncMetadata(undefined);
   }
 
   appendChild(note: Note) {
@@ -62,23 +62,5 @@ export class Note {
       current = current.parent;
     }
     return notes;
-  }
-
-  syncMetadata(metadata: NoteMetadata | undefined) {
-    this.title =
-      metadata?.title ??
-      Note.generateNoteTitle(this.originalName, this.titlecase);
-  }
-
-  static generateNoteTitle(originalName: string, titlecase: boolean) {
-    if (!titlecase) return originalName;
-    return originalName
-      .split("-")
-      .map((item) => item.trim())
-      .filter((item) => item.length > 0)
-      .map((word) => {
-        return word[0].toUpperCase() + word.substring(1).toLowerCase();
-      })
-      .join(" ");
   }
 }

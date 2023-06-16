@@ -2,41 +2,31 @@ import { ParsedPath } from "std/path/mod.ts";
 import { Note } from "./note.ts";
 
 export class NoteTree {
-  root: Note = new Note("root", true);
+  root: Note = new Note("root");
 
   sort() {
     this.root.sortChildren(true);
   }
 
-  public static getPathFromFilePath(path: ParsedPath) {
-    return path.name.split(".");
+  public static getPathSegment(path: string) {
+    return path.split(".");
   }
 
   private static isRootPath(path: string[]) {
     return path.length === 1 && path[0] === "root";
   }
 
-  /**
-   * Check whetever generated note title must be title case or not
-   * @param path file path
-   */
-
-  private static isUseTitleCase(path: ParsedPath) {
-    return path.name.toLowerCase() === path.name;
-  }
-
-  add(filePath: ParsedPath, sort = false) {
-    const titlecase = NoteTree.isUseTitleCase(filePath);
-    const path = NoteTree.getPathFromFilePath(filePath);
+  add(path: string, sort = false) {
+    const pathSegment = NoteTree.getPathSegment(path);
 
     let currentNote: Note = this.root;
 
-    if (!NoteTree.isRootPath(path))
-      for (const name of path) {
+    if (!NoteTree.isRootPath(pathSegment))
+      for (const name of pathSegment) {
         let note: Note | undefined = currentNote.findChildren(name);
 
         if (!note) {
-          note = new Note(name, titlecase);
+          note = new Note(name);
           currentNote.appendChild(note);
           if (sort) currentNote.sortChildren(false);
         }
@@ -44,18 +34,17 @@ export class NoteTree {
         currentNote = note;
       }
 
-    currentNote.filePath = filePath;
     return currentNote;
   }
 
-  get(filePath: ParsedPath) {
-    const path = NoteTree.getPathFromFilePath(filePath);
+  get(path: string) {
+    const pathSegment = NoteTree.getPathSegment(path);
 
-    if (NoteTree.isRootPath(path)) return this.root;
+    if (NoteTree.isRootPath(pathSegment)) return this.root;
 
     let currentNote: Note = this.root;
 
-    for (const name of path) {
+    for (const name of pathSegment) {
       const found = currentNote.findChildren(name);
       if (!found) return undefined;
       currentNote = found;
@@ -64,8 +53,8 @@ export class NoteTree {
     return currentNote;
   }
 
-  delete(filePath: ParsedPath) {
-    const note = this.get(filePath);
+  delete(path: string) {
+    const note = this.get(path);
     if (!note) return;
 
     note.filePath = undefined;

@@ -21,13 +21,17 @@ export function markdownLineEnding(code: Code) {
 
 export type SimplifiedEvent = [Event[0], Event[1]["type"], string];
 
+export function parseMarkdown(options: ParseOptions, md: string) {
+  return postprocess(
+    parse(options).document().write(preprocess()(md, "utf8", true))
+  );
+}
+
 export function parseAsSimplifiedEvents(
   options: ParseOptions,
   md: string
 ): SimplifiedEvent[] {
-  return postprocess(
-    parse(options).document().write(preprocess()(md, "utf8", true))
-  ).map((event) => {
+  return parseMarkdown(options, md).map((event) => {
     return [event[0], event[1].type, event[2].sliceSerialize(event[1])];
   });
 }
