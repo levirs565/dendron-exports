@@ -1,8 +1,8 @@
-export function add(a: number, b: number): number {
-  return a + b;
-}
+import { Vault } from "./engine/vault.ts";
 
 // Learn more at https://deno.land/manual/examples/module_metadata#concepts
 if (import.meta.main) {
-  console.log("Add 2 + 3 =", add(2, 3));
+  const vault = new Vault("/home/levirs565/GitHub/notes/vault");
+  await vault.index();
+  console.log(vault.tree.flatten().map((note) => note.getPath()));
 }

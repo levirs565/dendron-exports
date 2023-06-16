@@ -1,3 +1,4 @@
+import { ParsedPath } from "std/path/mod.ts";
 import { Note } from "./note.ts";
 
 export class NoteTree {
@@ -7,8 +8,8 @@ export class NoteTree {
     this.root.sortChildren(true);
   }
 
-  public static getPathFromFileName(name: string) {
-    return name.split(".");
+  public static getPathFromFilePath(path: ParsedPath) {
+    return path.name.split(".");
   }
 
   private static isRootPath(path: string[]) {
@@ -17,16 +18,16 @@ export class NoteTree {
 
   /**
    * Check whetever generated note title must be title case or not
-   * @param filename file base name
+   * @param path file path
    */
 
-  private static isUseTitleCase(filename: string) {
-    return filename.toLowerCase() === filename;
+  private static isUseTitleCase(path: ParsedPath) {
+    return path.name.toLowerCase() === path.name;
   }
 
-  addFile(filename: string, sort = false) {
-    const titlecase = NoteTree.isUseTitleCase(filename);
-    const path = NoteTree.getPathFromFileName(filename);
+  add(filePath: ParsedPath, sort = false) {
+    const titlecase = NoteTree.isUseTitleCase(filePath);
+    const path = NoteTree.getPathFromFilePath(filePath);
 
     let currentNote: Note = this.root;
 
@@ -43,12 +44,12 @@ export class NoteTree {
         currentNote = note;
       }
 
-    currentNote.filename = filename;
+    currentNote.filePath = filePath;
     return currentNote;
   }
 
-  getFromFileName(name: string) {
-    const path = NoteTree.getPathFromFileName(name);
+  get(filePath: ParsedPath) {
+    const path = NoteTree.getPathFromFilePath(filePath);
 
     if (NoteTree.isRootPath(path)) return this.root;
 
@@ -63,17 +64,17 @@ export class NoteTree {
     return currentNote;
   }
 
-  deleteByFileName(name: string) {
-    const note = this.getFromFileName(name);
+  delete(filePath: ParsedPath) {
+    const note = this.get(filePath);
     if (!note) return;
 
-    note.filename = undefined;
+    note.filePath = undefined;
     if (note.children.length == 0) {
       let currentNote: Note | undefined = note;
       while (
         currentNote &&
         currentNote.parent &&
-        !currentNote.filename &&
+        !currentNote.filePath &&
         currentNote.children.length == 0
       ) {
         const parent: Note | undefined = currentNote.parent;

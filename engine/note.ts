@@ -1,3 +1,5 @@
+import { ParsedPath } from "std/path/mod.ts";
+
 export interface NoteMetadata {
   title?: string;
 }
@@ -5,7 +7,7 @@ export interface NoteMetadata {
 export class Note {
   name: string;
   children: Note[] = [];
-  filename?: string;
+  filePath?: ParsedPath;
   parent?: Note;
   title = "";
 
