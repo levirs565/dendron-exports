@@ -1,10 +1,16 @@
 import { format } from "std/path/mod.ts";
+import { fromMarkdown } from "mdast-util-from-markdown";
 import { extract, test } from "std/front_matter/any.ts";
-import { parseMarkdown } from "../markdown/utils.ts";
-import { wikiLinkExtension, WikiLinkHandler } from "../markdown/wikilink.ts";
 import { Note } from "./note.ts";
 import { getNoteTitle } from "./metadata.ts";
-import { refExtension } from "../markdown/ref.ts";
+import { wikiLinkMicromark } from "../markdown/micromark/wikilink.ts";
+import { refMicromark } from "../markdown/micromark/ref.ts";
+import {
+  WikiLinkNode,
+  wikiLinkFromMarkdown,
+} from "../markdown/mdast/wikilink.ts";
+import { refFromMarkdown } from "../markdown/mdast/ref.ts";
+import { visit } from "unist-util-visit";
 
 export class Loader {
   async load(note: Note) {
@@ -17,19 +23,17 @@ export class Loader {
         note.content = body;
       }
 
-      note.document = parseMarkdown(
-        {
-          extensions: [refExtension, wikiLinkExtension],
-        },
-        note.content
-      );
+      note.document = fromMarkdown(note.content, "utf8", {
+        extensions: [refMicromark, wikiLinkMicromark],
+        mdastExtensions: [refFromMarkdown, wikiLinkFromMarkdown],
+      });
 
-      const linkHandler = new WikiLinkHandler();
-      for (const event of note.document) {
-        if (linkHandler.on(event)) {
-          if (linkHandler.link) metadata.links.push(linkHandler.link);
-        }
-      }
+      visit(note.document, "wikiLink", (node: WikiLinkNode) => {
+        metadata.links.push({
+          target: node.target,
+          title: node.title,
+        });
+      });
     }
 
     if (metadata.frontmatter.id) metadata.id = String(metadata.frontmatter.id);

@@ -3,16 +3,14 @@ import { parse } from "micromark/lib/parse.js";
 import { preprocess } from "micromark/lib/preprocess.js";
 import { postprocess } from "micromark/lib/postprocess.js";
 import { assertEquals } from "std/testing/asserts.ts";
-import { WikiLinkHandler, wikiLinkExtension } from "./wikilink.ts";
-import { WikiLink } from "../engine/wikilink.ts";
-import { parseMarkdown } from "./utils.ts";
+import { wikiLinkMicromark } from "./wikilink.ts";
 
 type SimplifiedEvent = [Event[0], Event[1]["type"], string];
 
 function micromarkEvents(md: string): SimplifiedEvent[] {
   return postprocess(
     parse({
-      extensions: [wikiLinkExtension],
+      extensions: [wikiLinkMicromark],
     })
       .document()
       .write(preprocess()(md, "utf8", true))
@@ -185,39 +183,4 @@ Deno.test("handle invalid wikilink with blank after pipe", () => {
     ["exit", "paragraph", content],
     ["exit", "content", content],
   ] as SimplifiedEvent[]);
-});
-
-function collectWikiLink(md: string): WikiLink[] {
-  const events = parseMarkdown(
-    {
-      extensions: [wikiLinkExtension],
-    },
-    md
-  );
-  const handler = new WikiLinkHandler();
-  const links: WikiLink[] = [];
-
-  for (const event of events) {
-    if (handler.on(event) && handler.link) {
-      links.push(handler.link!);
-    }
-  }
-  return links;
-}
-
-Deno.test("handler can parse wikilink without title", () => {
-  assertEquals(collectWikiLink("[[Wiki Link]]"), [
-    {
-      target: "Wiki Link",
-    },
-  ]);
-});
-
-Deno.test("handler can parse wikilink with title", () => {
-  assertEquals(collectWikiLink("[[Link Title|Wiki Link]]"), [
-    {
-      target: "Wiki Link",
-      title: "Link Title",
-    },
-  ]);
 });

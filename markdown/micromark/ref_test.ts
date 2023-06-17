@@ -1,11 +1,11 @@
 import { assertEquals } from "std/testing/asserts.ts";
 import { SimplifiedEvent, parseAsSimplifiedEvents } from "./utils.ts";
-import { refExtension } from "./ref.ts";
+import { refMicromark } from "./ref.ts";
 
 function micromarkEvents(md: string) {
   return parseAsSimplifiedEvents(
     {
-      extensions: [refExtension],
+      extensions: [refMicromark],
     },
     md
   );

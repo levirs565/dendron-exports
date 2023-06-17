@@ -1,6 +1,7 @@
 import { ParsedPath } from "std/path/mod.ts";
 import { createBlankMetadata } from "./metadata.ts";
 import { Event } from "micromark-util-types";
+import { Root } from "mdast";
 
 export class Note {
   name: string;
@@ -10,7 +11,10 @@ export class Note {
   filePath?: ParsedPath;
   content?: string;
   metadata = createBlankMetadata();
-  document: Event[] = [];
+  document: Root = {
+    type: "root",
+    children: [],
+  };
 
   constructor(public originalName: string) {
     this.name = originalName.toLowerCase();

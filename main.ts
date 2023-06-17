@@ -1,5 +1,8 @@
 import { Loader } from "./engine/loader.ts";
+import { Renderer } from "./engine/renderer.ts";
 import { Vault } from "./engine/vault.ts";
+import { ensureDir } from "std/fs/mod.ts";
+import { join } from "std/path/mod.ts";
 
 // Learn more at https://deno.land/manual/examples/module_metadata#concepts
 if (import.meta.main) {
@@ -9,9 +12,25 @@ if (import.meta.main) {
   const loader = new Loader();
   console.log("Parsing");
   await Promise.all(vault.tree.flatten().map((note) => loader.load(note)));
-  console.log(vault.tree.get("fisika.listrik-dinamis")?.metadata?.links);
   vault.buildBacklinks();
-  console.log(
-    vault.tree.get("matematika.asimtot")?.metadata.backlinks[0].getPath()
+  console.log("Rendering");
+
+  const target = "./target";
+  const renderer = new Renderer();
+  await ensureDir(target);
+  await Promise.all(
+    vault.tree.flatten().map((note) =>
+      (async () => {
+        try {
+          const text = renderer.renderNote(note);
+          await Deno.writeTextFile(
+            join(target, `${note.metadata.id}.md`),
+            text
+          );
+        } catch (e) {
+          console.log(e);
+        }
+      })()
+    )
   );
 }
