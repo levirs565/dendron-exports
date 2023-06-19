@@ -1,7 +1,4 @@
-import { Code, ParseOptions, Event } from "micromark-util-types";
-import { parse } from "micromark/lib/parse.js";
-import { preprocess } from "micromark/lib/preprocess.js";
-import { postprocess } from "micromark/lib/postprocess.js";
+import { micromark } from "../../deps/mod.ts";
 
 export const codes = {
   horizontalTab: -2,
@@ -11,24 +8,31 @@ export const codes = {
   space: 32,
 };
 
-export function markdownLineEndingOrSpace(code: Code) {
+export function markdownLineEndingOrSpace(code: micromark.Code) {
   return code == codes.eof || code < codes.nul || code === codes.space;
 }
 
-export function markdownLineEnding(code: Code) {
+export function markdownLineEnding(code: micromark.Code) {
   return code && code < codes.horizontalTab;
 }
 
-export type SimplifiedEvent = [Event[0], Event[1]["type"], string];
+export type SimplifiedEvent = [
+  micromark.Event[0],
+  micromark.Event[1]["type"],
+  string
+];
 
-export function parseMarkdown(options: ParseOptions, md: string) {
-  return postprocess(
-    parse(options).document().write(preprocess()(md, "utf8", true))
+export function parseMarkdown(options: micromark.ParseOptions, md: string) {
+  return micromark.postprocess(
+    micromark
+      .parse(options)
+      .document()
+      .write(micromark.preprocess()(md, "utf8", true))
   );
 }
 
 export function parseAsSimplifiedEvents(
-  options: ParseOptions,
+  options: micromark.ParseOptions,
   md: string
 ): SimplifiedEvent[] {
   return parseMarkdown(options, md).map((event) => {

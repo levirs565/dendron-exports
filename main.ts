@@ -1,8 +1,7 @@
+import { fs, path } from "./deps/mod.ts";
 import { Loader } from "./engine/loader.ts";
 import { Renderer } from "./engine/renderer.ts";
 import { Vault } from "./engine/vault.ts";
-import { ensureDir } from "std/fs/mod.ts";
-import { join } from "std/path/mod.ts";
 
 // Learn more at https://deno.land/manual/examples/module_metadata#concepts
 if (import.meta.main) {
@@ -17,14 +16,14 @@ if (import.meta.main) {
 
   const target = "./target";
   const renderer = new Renderer();
-  await ensureDir(target);
+  await fs.ensureDir(target);
   await Promise.all(
     vault.tree.flatten().map((note) =>
       (async () => {
         try {
           const text = renderer.renderNote(note);
           await Deno.writeTextFile(
-            join(target, `${note.metadata.id}.md`),
+            path.join(target, `${note.metadata.id}.md`),
             text
           );
         } catch (e) {

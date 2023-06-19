@@ -1,13 +1,14 @@
-import { CompileContext, Extension } from "mdast-util-from-markdown";
-import { Token } from "micromark-util-types";
-import { Node } from "unist";
+import { unist, micromark, mdast } from "../../deps/mod.ts";
 
-export interface RefNode extends Node {
+export interface RefNode extends unist.Node {
   type: "ref";
   target: string;
 }
 
-function enterRef(this: CompileContext, token: Token): void {
+function enterRef(
+  this: mdast.FromMarkdown.CompileContext,
+  token: micromark.Token
+): void {
   this.enter(
     {
       type: "ref",
@@ -18,16 +19,22 @@ function enterRef(this: CompileContext, token: Token): void {
   );
 }
 
-function enterRefData(this: CompileContext, token: Token): void {
+function enterRefData(
+  this: mdast.FromMarkdown.CompileContext,
+  token: micromark.Token
+): void {
   const node = this.stack[this.stack.length - 1] as unknown as RefNode;
   node.target = this.sliceSerialize(token);
 }
 
-function exitRef(this: CompileContext, token: Token): void {
+function exitRef(
+  this: mdast.FromMarkdown.CompileContext,
+  token: micromark.Token
+): void {
   this.exit(token);
 }
 
-export const refFromMarkdown: Extension = {
+export const refFromMarkdown: mdast.FromMarkdown.Extension = {
   enter: {
     ref: enterRef,
   },

@@ -1,5 +1,5 @@
+import { path } from "../deps/mod.ts";
 import { NoteTree } from "./tree.ts";
-import { extname, join, parse } from "std/path/mod.ts";
 
 export class Vault {
   tree = new NoteTree();
@@ -7,15 +7,15 @@ export class Vault {
   constructor(public folder: string) {}
 
   isNote(name: string) {
-    return extname(name) === ".md";
+    return path.extname(name) === ".md";
   }
 
   async index() {
     for await (const file of Deno.readDir(this.folder)) {
       if (!file.isFile || !this.isNote(file.name)) continue;
-      const path = parse(join(this.folder, file.name));
-      const note = this.tree.add(path.name, false);
-      note.filePath = path;
+      const notePath = path.parse(path.join(this.folder, file.name));
+      const note = this.tree.add(notePath.name, false);
+      note.filePath = notePath;
     }
 
     this.tree.sort();

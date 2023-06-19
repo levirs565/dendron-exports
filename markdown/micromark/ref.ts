@@ -1,38 +1,34 @@
-import { Code, Effects, Extension, State } from "micromark-util-types";
+import { micromark } from "../../deps/mod.ts";
 import {
   codes,
   markdownLineEnding,
   markdownLineEndingOrSpace,
 } from "./utils.ts";
 
-declare module "micromark-util-types" {
-  export interface TokenTypeMap {
-    ref: "ref";
-    refMarker: "refMarker";
-    refData: "refData";
-  }
-}
-
 const startMarker = "![[";
 const endMarker = "]]";
 
-function wikiLinkTokenize(effects: Effects, ok: State, nok: State): State {
+function wikiLinkTokenize(
+  effects: micromark.Effects,
+  ok: micromark.State,
+  nok: micromark.State
+): micromark.State {
   let startMarkerCursor = 0;
   let endMarkerCursor = 0;
   let dataLength = 0;
 
   return start;
 
-  function start(code: Code): State {
+  function start(code: micromark.Code): micromark.State | void {
     effects.enter("ref");
     effects.enter("refMarker");
 
     return consumerStartMarker(code);
   }
 
-  function consumerStartMarker(code: Code): State {
+  function consumerStartMarker(code: micromark.Code): micromark.State | void {
     if (code !== startMarker.charCodeAt(startMarkerCursor)) {
-      return nok(code) as State;
+      return nok(code);
     }
 
     effects.consume(code);
@@ -46,16 +42,16 @@ function wikiLinkTokenize(effects: Effects, ok: State, nok: State): State {
     return consumerStartMarker;
   }
 
-  function consumeData(code: Code): State {
+  function consumeData(code: micromark.Code): micromark.State | void {
     if (code === endMarker.charCodeAt(0)) {
-      if (dataLength == 0) return nok(code) as State;
+      if (dataLength == 0) return nok(code);
       effects.exit("refData");
       effects.enter("refMarker");
       return consumeEndMarker(code);
     }
 
     if (markdownLineEnding(code) || code === codes.eof) {
-      return nok(code) as State;
+      return nok(code);
     }
 
     if (!markdownLineEndingOrSpace(code)) {
@@ -66,9 +62,9 @@ function wikiLinkTokenize(effects: Effects, ok: State, nok: State): State {
     return consumeData;
   }
 
-  function consumeEndMarker(code: Code): State {
+  function consumeEndMarker(code: micromark.Code): micromark.State | void {
     if (code !== endMarker.charCodeAt(endMarkerCursor)) {
-      return nok(code) as State;
+      return nok(code);
     }
 
     effects.consume(code);
@@ -83,7 +79,7 @@ function wikiLinkTokenize(effects: Effects, ok: State, nok: State): State {
   }
 }
 
-export const refMicromark: Extension = {
+export const refMicromark: micromark.Extension = {
   text: {
     [startMarker.charCodeAt(0)]: {
       name: "ref",

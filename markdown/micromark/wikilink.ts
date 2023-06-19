@@ -1,40 +1,35 @@
-import { Code, Effects, Extension, State } from "micromark-util-types";
+import { micromark } from "../../deps/mod.ts";
 import {
   codes,
   markdownLineEnding,
   markdownLineEndingOrSpace,
 } from "./utils.ts";
 
-declare module "micromark-util-types" {
-  export interface TokenTypeMap {
-    wikiLink: "wikiLink";
-    wikiLinkMarker: "wikiLinkMarker";
-    wikiLinkData: "wikiLinkData";
-    wikiLinkTitlePipe: "wikiLinkTitlePipe";
-  }
-}
-
 const startMarker = "[[";
 const endMarker = "]]";
 const aliasPipe = "|";
 
-function wikiLinkTokenize(effects: Effects, ok: State, nok: State): State {
+function wikiLinkTokenize(
+  effects: micromark.Effects,
+  ok: micromark.State,
+  nok: micromark.State
+): micromark.State {
   let startMarkerCursor = 0;
   let endMarkerCursor = 0;
   let dataLength = 0;
 
   return start;
 
-  function start(code: Code): State {
+  function start(code: micromark.Code): micromark.State | void {
     effects.enter("wikiLink");
     effects.enter("wikiLinkMarker");
 
     return consumerStartMarker(code);
   }
 
-  function consumerStartMarker(code: Code): State {
+  function consumerStartMarker(code: micromark.Code): micromark.State | void {
     if (code !== startMarker.charCodeAt(startMarkerCursor)) {
-      return nok(code) as State;
+      return nok(code);
     }
 
     effects.consume(code);
@@ -48,23 +43,23 @@ function wikiLinkTokenize(effects: Effects, ok: State, nok: State): State {
     return consumerStartMarker;
   }
 
-  function consumeData(code: Code): State {
+  function consumeData(code: micromark.Code): micromark.State | void {
     if (code === endMarker.charCodeAt(0)) {
-      if (dataLength == 0) return nok(code) as State;
+      if (dataLength == 0) return nok(code);
       effects.exit("wikiLinkData");
       effects.enter("wikiLinkMarker");
       return consumeEndMarker(code);
     }
 
     if (code === aliasPipe.charCodeAt(0)) {
-      if (dataLength == 0) return nok(code) as State;
+      if (dataLength == 0) return nok(code);
       effects.exit("wikiLinkData");
       effects.enter("wikiLinkTitlePipe");
       return consumeAliasPipe(code);
     }
 
     if (markdownLineEnding(code) || code === codes.eof) {
-      return nok(code) as State;
+      return nok(code);
     }
 
     if (!markdownLineEndingOrSpace(code)) {
@@ -75,7 +70,7 @@ function wikiLinkTokenize(effects: Effects, ok: State, nok: State): State {
     return consumeData;
   }
 
-  function consumeAliasPipe(code: Code): State {
+  function consumeAliasPipe(code: micromark.Code): micromark.State | void {
     dataLength = 0;
     effects.consume(code);
     effects.exit("wikiLinkTitlePipe");
@@ -83,9 +78,9 @@ function wikiLinkTokenize(effects: Effects, ok: State, nok: State): State {
     return consumeData;
   }
 
-  function consumeEndMarker(code: Code): State {
+  function consumeEndMarker(code: micromark.Code): micromark.State | void {
     if (code !== endMarker.charCodeAt(endMarkerCursor)) {
-      return nok(code) as State;
+      return nok(code);
     }
 
     effects.consume(code);
@@ -100,7 +95,7 @@ function wikiLinkTokenize(effects: Effects, ok: State, nok: State): State {
   }
 }
 
-export const wikiLinkMicromark: Extension = {
+export const wikiLinkMicromark: micromark.Extension = {
   text: {
     91: {
       name: "wikiLink",

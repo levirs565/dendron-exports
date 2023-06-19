@@ -1,15 +1,16 @@
-import { CompileContext, Extension } from "mdast-util-from-markdown";
-import { Token } from "micromark-util-types";
-import { Node } from "unist";
+import { mdast, micromark, unist } from "../../deps/mod.ts";
 
-export interface WikiLinkNode extends Node {
+export interface WikiLinkNode extends unist.Node {
   type: "wikiLink";
   value: string[];
   target: string;
   title?: string;
 }
 
-function enterWikiLink(this: CompileContext, token: Token): void {
+function enterWikiLink(
+  this: mdast.FromMarkdown.CompileContext,
+  token: micromark.Token
+): void {
   this.enter(
     {
       type: "wikiLink",
@@ -21,12 +22,18 @@ function enterWikiLink(this: CompileContext, token: Token): void {
   );
 }
 
-function exitWikiLinkData(this: CompileContext, token: Token): void {
+function exitWikiLinkData(
+  this: mdast.FromMarkdown.CompileContext,
+  token: micromark.Token
+): void {
   const node = this.stack[this.stack.length - 1] as unknown as WikiLinkNode;
   node.value.push(this.sliceSerialize(token));
 }
 
-function exitWikiLink(this: CompileContext, token: Token): void {
+function exitWikiLink(
+  this: mdast.FromMarkdown.CompileContext,
+  token: micromark.Token
+): void {
   const node = this.exit(token) as unknown as WikiLinkNode;
   if (node.value.length == 2) {
     [node.title, node.target] = node.value;
@@ -35,7 +42,7 @@ function exitWikiLink(this: CompileContext, token: Token): void {
   }
 }
 
-export const wikiLinkFromMarkdown: Extension = {
+export const wikiLinkFromMarkdown: mdast.FromMarkdown.Extension = {
   enter: {
     wikiLink: enterWikiLink,
   },

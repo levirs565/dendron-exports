@@ -1,6 +1,6 @@
-import { assertEquals } from "std/testing/asserts.ts";
 import { parseAsSimplifiedEvents } from "./utils.ts";
 import { blockAnchorMicromark } from "./blockAnchor.ts";
+import { asserts } from "../../deps/mod.ts";
 
 function micromarkEvents(md: string) {
   return parseAsSimplifiedEvents(
@@ -12,7 +12,7 @@ function micromarkEvents(md: string) {
 }
 
 Deno.test("parse block anchor", () => {
-  assertEquals(micromarkEvents("begin ^block-anchor"), [
+  asserts.assertEquals(micromarkEvents("begin ^block-anchor"), [
     ["enter", "content", "begin ^block-anchor"],
     ["enter", "paragraph", "begin ^block-anchor"],
     ["enter", "data", "begin "],
@@ -29,7 +29,7 @@ Deno.test("parse block anchor", () => {
 });
 
 Deno.test("parse block anchor at end of line", () => {
-  assertEquals(micromarkEvents("begin ^block-anchor\n\n"), [
+  asserts.assertEquals(micromarkEvents("begin ^block-anchor\n\n"), [
     ["enter", "content", "begin ^block-anchor"],
     ["enter", "paragraph", "begin ^block-anchor"],
     ["enter", "data", "begin "],
@@ -50,7 +50,7 @@ Deno.test("parse block anchor at end of line", () => {
 });
 
 Deno.test("parse anchor with all variation", () => {
-  assertEquals(micromarkEvents("begin ^abd_ABC-19495-"), [
+  asserts.assertEquals(micromarkEvents("begin ^abd_ABC-19495-"), [
     ["enter", "content", "begin ^abd_ABC-19495-"],
     ["enter", "paragraph", "begin ^abd_ABC-19495-"],
     ["enter", "data", "begin "],
@@ -67,7 +67,7 @@ Deno.test("parse anchor with all variation", () => {
 });
 
 Deno.test("do not parse anchor at middle", () => {
-  assertEquals(micromarkEvents("begin ^block-anchor end"), [
+  asserts.assertEquals(micromarkEvents("begin ^block-anchor end"), [
     ["enter", "content", "begin ^block-anchor end"],
     ["enter", "paragraph", "begin ^block-anchor end"],
     ["enter", "data", "begin ^block-anchor end"],
@@ -78,7 +78,7 @@ Deno.test("do not parse anchor at middle", () => {
 });
 
 Deno.test("do not parse anchor caret at end", () => {
-  assertEquals(micromarkEvents("begin ^block-anchor^"), [
+  asserts.assertEquals(micromarkEvents("begin ^block-anchor^"), [
     ["enter", "content", "begin ^block-anchor^"],
     ["enter", "paragraph", "begin ^block-anchor^"],
     ["enter", "data", "begin ^block-anchor^"],
@@ -89,7 +89,7 @@ Deno.test("do not parse anchor caret at end", () => {
 });
 
 Deno.test("do not parse blank anchor", () => {
-  assertEquals(
+  asserts.assertEquals(
     micromarkEvents("begin ^"),
 
     [

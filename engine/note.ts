@@ -1,17 +1,15 @@
-import { ParsedPath } from "std/path/mod.ts";
+import { mdast, path } from "../deps/mod.ts";
 import { createBlankMetadata } from "./metadata.ts";
-import { Event } from "micromark-util-types";
-import { Root } from "mdast";
 
 export class Note {
   name: string;
   children: Note[] = [];
   parent?: Note;
 
-  filePath?: ParsedPath;
+  filePath?: path.ParsedPath;
   content?: string;
   metadata = createBlankMetadata();
-  document: Root = {
+  document: mdast.Root = {
     type: "root",
     children: [],
   };

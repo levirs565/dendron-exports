@@ -1,4 +1,4 @@
-import { ParsedPath } from "std/path/mod.ts";
+import { path } from "../deps/mod.ts";
 import { WikiLink } from "./wikilink.ts";
 import { Note } from "./note.ts";
 
@@ -45,7 +45,7 @@ function findNonEmpty(note: Note): Note | null {
  * @param path file path
  */
 
-function isUseTitleCase(path: ParsedPath) {
+function isUseTitleCase(path: path.ParsedPath) {
   return path.name.toLowerCase() === path.name;
 }
 

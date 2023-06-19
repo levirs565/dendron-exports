@@ -1,12 +1,13 @@
-import { CompileContext, Extension } from "mdast-util-from-markdown";
-import { Token } from "micromark-util-types";
-import { Literal } from "mdast";
+import { mdast, micromark } from "../../deps/mod.ts";
 
-export interface BlockAnchorNode extends Literal {
+export interface BlockAnchorNode extends mdast.Literal {
   type: "blockAnchor";
 }
 
-function enterBlockAnchor(this: CompileContext, token: Token): void {
+function enterBlockAnchor(
+  this: mdast.FromMarkdown.CompileContext,
+  token: micromark.Token
+): void {
   this.enter(
     {
       type: "blockAnchor",
@@ -17,16 +18,22 @@ function enterBlockAnchor(this: CompileContext, token: Token): void {
   );
 }
 
-function exitBlockAnchorData(this: CompileContext, token: Token): void {
+function exitBlockAnchorData(
+  this: mdast.FromMarkdown.CompileContext,
+  token: micromark.Token
+): void {
   const node = this.stack[this.stack.length - 1] as unknown as BlockAnchorNode;
   node.value = this.sliceSerialize(token);
 }
 
-function exitBlockAnchor(this: CompileContext, token: Token): void {
+function exitBlockAnchor(
+  this: mdast.FromMarkdown.CompileContext,
+  token: micromark.Token
+): void {
   this.exit(token);
 }
 
-export const blockAnchorFromMarkdown: Extension = {
+export const blockAnchorFromMarkdown: mdast.FromMarkdown.Extension = {
   enter: {
     blockAnchor: enterBlockAnchor,
   },

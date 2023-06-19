@@ -1,4 +1,3 @@
-import { ParsedPath } from "std/path/mod.ts";
 import { Note } from "./note.ts";
 
 export class NoteTree {

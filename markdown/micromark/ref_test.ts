@@ -1,4 +1,4 @@
-import { assertEquals } from "std/testing/asserts.ts";
+import { asserts } from "../../deps/mod.ts";
 import { SimplifiedEvent, parseAsSimplifiedEvents } from "./utils.ts";
 import { refMicromark } from "./ref.ts";
 
@@ -13,7 +13,7 @@ function micromarkEvents(md: string) {
 
 Deno.test("parse ref", () => {
   const content = "![[Dendron Ref]]";
-  assertEquals(micromarkEvents(content), [
+  asserts.assertEquals(micromarkEvents(content), [
     ["enter", "content", content],
     ["enter", "paragraph", content],
     ["enter", "ref", content],
@@ -31,7 +31,7 @@ Deno.test("parse ref", () => {
 
 Deno.test("handle open ref", () => {
   const content = "t![[\nt";
-  assertEquals(micromarkEvents(content), [
+  asserts.assertEquals(micromarkEvents(content), [
     ["enter", "content", content],
     ["enter", "paragraph", content],
     ["enter", "data", "t"],
@@ -51,7 +51,7 @@ Deno.test("handle open ref", () => {
 
 Deno.test("handles open ref links at end of file", () => {
   const content = "t ![[";
-  assertEquals(micromarkEvents(content), [
+  asserts.assertEquals(micromarkEvents(content), [
     ["enter", "content", content],
     ["enter", "paragraph", content],
     ["enter", "data", "t "],
@@ -67,7 +67,7 @@ Deno.test("handles open ref links at end of file", () => {
 
 Deno.test("handles open ref with partial data", () => {
   const content = "t ![[tt\nt";
-  assertEquals(micromarkEvents(content), [
+  asserts.assertEquals(micromarkEvents(content), [
     ["enter", "content", content],
     ["enter", "paragraph", content],
     ["enter", "data", "t "],
@@ -89,7 +89,7 @@ Deno.test("handles open ref with partial data", () => {
 
 Deno.test("handle invalid ref with blank data", () => {
   const content = "![[]]";
-  assertEquals(micromarkEvents(content), [
+  asserts.assertEquals(micromarkEvents(content), [
     ["enter", "content", content],
     ["enter", "paragraph", content],
     ["enter", "data", "!["],

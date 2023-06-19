@@ -1,19 +1,5 @@
-import {
-  Code,
-  Effects,
-  Extension,
-  State,
-  TokenizeContext,
-} from "micromark-util-types";
+import { micromark } from "../../deps/mod.ts";
 import { codes, markdownLineEnding } from "./utils.ts";
-
-declare module "micromark-util-types" {
-  export interface TokenTypeMap {
-    blockAnchor: "blockAnchor";
-    blockAnchorMarker: "blockAnchorMarker";
-    blockAnchorData: "blockAnchorData";
-  }
-}
 
 const startMarkerCode = "^".charCodeAt(0);
 const firstUpperCode = "A".charCodeAt(0);
@@ -25,7 +11,7 @@ const lastNumberCode = "9".charCodeAt(0);
 const underscoreCode = "_".charCodeAt(0);
 const hypenCode = "-".charCodeAt(0);
 
-function isCodeAllowed(code: Code) {
+function isCodeAllowed(code: micromark.Code) {
   return (
     code &&
     ((code >= firstUpperCode && code <= lastUpperCode) ||
@@ -37,21 +23,21 @@ function isCodeAllowed(code: Code) {
 }
 
 function blockAnchorTokenize(
-  this: TokenizeContext,
-  effects: Effects,
-  ok: State,
-  nok: State
-): State {
+  this: micromark.TokenizeContext,
+  effects: micromark.Effects,
+  ok: micromark.State,
+  nok: micromark.State
+): micromark.State {
   let length = 0;
   return start;
 
-  function start(code: Code): State | void {
+  function start(code: micromark.Code): micromark.State | void {
     effects.enter("blockAnchor");
     effects.enter("blockAnchorMarker");
     return consumeStartMarker(code);
   }
 
-  function consumeStartMarker(code: Code): State | void {
+  function consumeStartMarker(code: micromark.Code): micromark.State | void {
     if (code !== startMarkerCode) {
       return nok(code);
     }
@@ -62,7 +48,7 @@ function blockAnchorTokenize(
     return consumeData;
   }
 
-  function consumeData(code: Code): void | State {
+  function consumeData(code: micromark.Code): micromark.State | void {
     if (markdownLineEnding(code) || code === codes.eof) {
       if (length === 0) {
         return nok(code);
@@ -82,7 +68,7 @@ function blockAnchorTokenize(
   }
 }
 
-export const blockAnchorMicromark: Extension = {
+export const blockAnchorMicromark: micromark.Extension = {
   text: {
     [startMarkerCode]: {
       name: "blockAnchor",
