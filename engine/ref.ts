@@ -78,7 +78,7 @@ export function anchorToLinkSubpath(anchor: RefAnchor): string | null {
   return "";
 }
 
-export function parseRefSubpath(str: string): RefSubpath | undefined {
+export function parseRefSubpath(str: string): RefSubpath {
   const [startStr, endStr] = str.split(":#", 2);
   return {
     text: str,

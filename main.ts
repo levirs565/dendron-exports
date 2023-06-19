@@ -15,7 +15,7 @@ if (import.meta.main) {
   console.log("Rendering");
 
   const target = "./target";
-  const renderer = new Renderer();
+  const renderer = new Renderer(vault);
   await fs.ensureDir(target);
   await Promise.all(
     vault.tree.flatten().map((note) =>
