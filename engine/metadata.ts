@@ -1,4 +1,4 @@
-import { path } from "../deps/mod.ts";
+import { path, stdCrypto } from "../deps/mod.ts";
 import { WikiLink } from "./wikilink.ts";
 import { Note } from "./note.ts";
 
@@ -59,4 +59,20 @@ function generateNoteTitle(originalName: string, titlecase: boolean) {
       return word[0].toUpperCase() + word.substring(1).toLowerCase();
     })
     .join(" ");
+}
+
+const encoder = new TextEncoder();
+
+export async function generateNoteId(vaultName: string, path: string) {
+  const data = encoder.encode(`dendron://${vaultName}/${path}`);
+  const hash = await stdCrypto.crypto.subtle.digest(
+    {
+      name: "SHAKE128",
+      length: 15,
+    },
+    data
+  );
+  const hex = stdCrypto.toHashString(hash, "hex");
+  const big = BigInt(`0x${hex}`);
+  return big.toString(36).toLowerCase(); // 24 character long
 }

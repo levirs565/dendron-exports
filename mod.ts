@@ -11,6 +11,7 @@ export type NotePathBuilder = (note: Note) => string;
 export interface Options {
   baseDir: string;
   vaultPath: string;
+  vaultName: string;
 
   noteDest: string;
   noteRenderer: Renderer;

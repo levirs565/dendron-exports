@@ -24,7 +24,10 @@ async function runExport(args: { config?: string }) {
 
   console.log("Indexing vault");
 
-  const vault = new Vault(path.join(options.baseDir, options.vaultPath));
+  const vault = new Vault({
+    name: options.vaultName,
+    path: path.join(options.baseDir, options.vaultPath),
+  });
   await vault.index();
 
   console.log("Load vault notes");

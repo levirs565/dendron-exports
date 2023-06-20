@@ -1,6 +1,6 @@
 import { frontMatter, mdast, path, unist } from "../deps/mod.ts";
 import { Note } from "./note.ts";
-import { getNoteTitle } from "./metadata.ts";
+import { generateNoteId, getNoteTitle } from "./metadata.ts";
 import { wikiLinkMicromark } from "../markdown/micromark/wikilink.ts";
 import { refMicromark } from "../markdown/micromark/ref.ts";
 import {
@@ -13,7 +13,7 @@ import { blockAnchorMicromark } from "../markdown/micromark/blockAnchor.ts";
 import { blockAnchorFromMarkdown } from "../markdown/mdast/blockAnchor.ts";
 
 export class Loader {
-  async loadNote(note: Note) {
+  async loadNote(note: Note, vault: Vault) {
     const metadata = note.metadata;
     if (note.filePath) {
       note.content = await Deno.readTextFile(path.format(note.filePath));
@@ -41,12 +41,14 @@ export class Loader {
     }
 
     if (metadata.frontmatter.id) metadata.id = String(metadata.frontmatter.id);
+    else metadata.id = await generateNoteId(vault.config.name, note.getPath());
     metadata.title = getNoteTitle(note, metadata);
   }
 
   async loadVault(vault: Vault) {
     const promises: Promise<void>[] = [];
-    for (const note of vault.tree.walk()) promises.push(this.loadNote(note));
+    for (const note of vault.tree.walk())
+      promises.push(this.loadNote(note, vault));
     await Promise.all(promises);
   }
 }
