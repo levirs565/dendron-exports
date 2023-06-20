@@ -74,12 +74,12 @@ export class NoteTree {
     return note;
   }
 
-  private static *flattenInternal(root: Note): Generator<Note> {
+  private static *walkInternal(root: Note): Generator<Note> {
     yield root;
-    for (const child of root.children) yield* this.flattenInternal(child);
+    for (const child of root.children) yield* this.walkInternal(child);
   }
 
-  flatten() {
-    return Array.from(NoteTree.flattenInternal(this.root));
+  *walk() {
+    yield* NoteTree.walkInternal(this.root);
   }
 }

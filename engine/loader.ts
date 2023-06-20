@@ -8,9 +8,12 @@ import {
   wikiLinkFromMarkdown,
 } from "../markdown/mdast/wikilink.ts";
 import { refFromMarkdown } from "../markdown/mdast/ref.ts";
+import { Vault } from "./vault.ts";
+import { blockAnchorMicromark } from "../markdown/micromark/blockAnchor.ts";
+import { blockAnchorFromMarkdown } from "../markdown/mdast/blockAnchor.ts";
 
 export class Loader {
-  async load(note: Note) {
+  async loadNote(note: Note) {
     const metadata = note.metadata;
     if (note.filePath) {
       note.content = await Deno.readTextFile(path.format(note.filePath));
@@ -21,8 +24,12 @@ export class Loader {
       }
 
       note.document = mdast.fromMarkdown(note.content, "utf8", {
-        extensions: [refMicromark, wikiLinkMicromark],
-        mdastExtensions: [refFromMarkdown, wikiLinkFromMarkdown],
+        extensions: [refMicromark, wikiLinkMicromark, blockAnchorMicromark],
+        mdastExtensions: [
+          refFromMarkdown,
+          wikiLinkFromMarkdown,
+          blockAnchorFromMarkdown,
+        ],
       });
 
       unist.visit(note.document, "wikiLink", (node: WikiLinkNode) => {
@@ -35,5 +42,11 @@ export class Loader {
 
     if (metadata.frontmatter.id) metadata.id = String(metadata.frontmatter.id);
     metadata.title = getNoteTitle(note, metadata);
+  }
+
+  async loadVault(vault: Vault) {
+    const promises: Promise<void>[] = [];
+    for (const note of vault.tree.walk()) promises.push(this.loadNote(note));
+    await Promise.all(promises);
   }
 }

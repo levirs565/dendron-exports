@@ -22,7 +22,7 @@ export class Vault {
   }
 
   buildBacklinks() {
-    for (const note of this.tree.flatten()) {
+    for (const note of this.tree.walk()) {
       for (const link of note.metadata.links) {
         const target = this.tree.get(link.target);
         if (!target) continue;

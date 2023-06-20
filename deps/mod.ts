@@ -10,3 +10,5 @@ export { default as GithubSlugger } from "https://esm.sh/github-slugger@2.0.0";
 export * as micromark from "./micromark.ts";
 export * as mdast from "./mdast.ts";
 export * as unist from "./unist.ts";
+
+export * as cliffy from "https://deno.land/x/cliffy@v0.25.7/command/mod.ts";
