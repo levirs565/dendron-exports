@@ -14,19 +14,37 @@ export interface RendererContext {
   pathBuilder: NotePathBuilder;
 }
 
+export interface RendererRefContext {
+  targetNote?: Note;
+  targetUrl?: string;
+  content: string;
+}
+
 export abstract class Renderer {
   protected context!: RendererContext;
+  protected toMarkdownOptions: mdast.ToMarkdown.Options;
 
-  constructor() {}
+  constructor() {
+    this.toMarkdownOptions = {
+      handlers: {
+        wikiLink: this.createWikiLinkHandler,
+        ref: this.refHandler,
+        blockAnchor: this.blockAnchor,
+      } as unknown as mdast.ToMarkdown.Handlers,
+      extensions: [mdast.mathToMarkdown()],
+    };
+  }
 
   setContext(context: RendererContext) {
     this.context = context;
   }
 
-  processFrontmatter(note: Note) {
+  processFrontmatter(note: Note): Record<string, unknown> {
     return {
       id: note.metadata.id,
       title: note.metadata.title,
+      subnotes: note.children.map((child) => child.metadata.id),
+      backlinks: note.metadata.backlinks.map((child) => child.metadata.id),
     };
   }
 
@@ -38,22 +56,25 @@ export abstract class Renderer {
     return `${frontmatter}\n\n${content}`;
   }
 
+  protected buildNoteUrl(
+    note: Note | undefined,
+    path: string,
+    subpath: string
+  ) {
+    return (
+      (note ? `/${this.context.pathBuilder(note)}` : path) +
+      (subpath.length > 0 ? "#" + subpath : "")
+    );
+  }
+
   renderDocument(node: mdast.Root | mdast.Content) {
-    return mdast.toMarkdown(node, {
-      handlers: {
-        wikiLink: this.createWikiLinkHandler,
-        ref: this.refHandler,
-        blockAnchor: this.blockAnchor,
-      } as unknown as mdast.ToMarkdown.Handlers,
-    });
+    return mdast.toMarkdown(node, this.toMarkdownOptions);
   }
 
   createWikiLinkHandler = (node: WikiLinkNode) => {
     const { path, subpath } = parseLink(node.target);
     const note = this.context.vault.tree.get(path);
-    const url =
-      (note ? `/${this.context.pathBuilder(note)}` : path) +
-      (subpath.length > 0 ? "#" + subpath : "");
+    const url = this.buildNoteUrl(note, path, subpath);
     const title = note ? note.metadata.title : path;
     return this.getWikiLinkText(url, title);
   };
@@ -61,22 +82,27 @@ export abstract class Renderer {
   refHandler = (node: RefNode) => {
     const { path, subpath } = parseLink(node.target);
     const note = this.context.vault.tree.get(path);
-    let text: string;
+    const context: RendererRefContext = {
+      targetNote: note,
+      targetUrl: this.buildNoteUrl(note, path, subpath),
+      content: "",
+    };
     if (note) {
       const result = resolveRefNodes(parseRefSubpath(subpath), note.document);
 
-      if (result.state === "success") text = this.renderDocument(result.root);
-      else text = result.message;
+      if (result.state === "success")
+        context.content = this.renderDocument(result.root);
+      else context.content = result.message;
     } else {
-      text = "Could not find note";
+      context.content = `Could not find note "${path}"`;
     }
 
-    return this.getRefText(text);
+    return this.getRefText(context);
   };
 
   blockAnchor = (node: BlockAnchorNode) => this.getBlockAnchorText(node.value);
 
-  abstract getRefText(content: string): string;
+  abstract getRefText(context: RendererRefContext): string;
   abstract getWikiLinkText(url: string, title: string): string;
   abstract getBlockAnchorText(name: string): string;
 }

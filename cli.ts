@@ -33,6 +33,7 @@ async function runExport(args: { config?: string }) {
   console.log("Load vault notes");
   const loader = new Loader();
   await loader.loadVault(vault);
+  vault.buildBacklinks();
 
   console.log("Exporting vault notes");
   const exporter = new Exporter({

@@ -1,4 +1,4 @@
-import { frontMatter, mdast, path, unist } from "../deps/mod.ts";
+import { frontMatter, mdast, micromark, path, unist } from "../deps/mod.ts";
 import { Note } from "./note.ts";
 import { generateNoteId, getNoteTitle } from "./metadata.ts";
 import { wikiLinkMicromark } from "../markdown/micromark/wikilink.ts";
@@ -24,8 +24,14 @@ export class Loader {
       }
 
       note.document = mdast.fromMarkdown(note.content, "utf8", {
-        extensions: [refMicromark, wikiLinkMicromark, blockAnchorMicromark],
+        extensions: [
+          micromark.math(),
+          refMicromark,
+          wikiLinkMicromark,
+          blockAnchorMicromark,
+        ],
         mdastExtensions: [
+          mdast.mathFromMarkdown(),
           refFromMarkdown,
           wikiLinkFromMarkdown,
           blockAnchorFromMarkdown,
