@@ -41,8 +41,10 @@ async function runExport(args: { config?: string }) {
     renderer: options.noteRenderer,
     pathBuilder: options.notePathBuilder,
   });
+  await exporter.exportVaultNotes(vault);
 
-  await exporter.exportVault(vault);
+  console.log("Exporting vault assets");
+  await exporter.exportVaultAssets(vault);
 }
 
 await new cliffy.Command()

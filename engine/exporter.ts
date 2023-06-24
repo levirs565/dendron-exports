@@ -12,7 +12,7 @@ export interface ExporterConfig {
 export class Exporter {
   constructor(public config: ExporterConfig) {}
 
-  async exportVault(vault: Vault) {
+  async exportVaultNotes(vault: Vault) {
     await fs.ensureDir(this.config.dest);
     this.config.renderer.setContext({
       pathBuilder: this.config.pathBuilder,
@@ -24,6 +24,18 @@ export class Exporter {
       promises.push(this.exportNote(note));
     }
     await Promise.all(promises);
+  }
+
+  async exportVaultAssets(vault: Vault) {
+    const srcDir = path.join(vault.config.path, "assets");
+    const destDir = path.join(this.config.dest, "assets");
+
+    if (!fs.exists(srcDir)) return;
+
+    await fs.ensureDir(destDir);
+    await fs.copy(srcDir, destDir, {
+      overwrite: true,
+    });
   }
 
   async exportNote(note: Note) {
