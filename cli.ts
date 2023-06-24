@@ -13,8 +13,9 @@ async function runExport(args: { config?: string }) {
   } else {
     configPath = await Deno.realPath("dendron-exports.config.ts");
   }
+  const configURL = path.toFileUrl(configPath);
 
-  const mod = await import(configPath);
+  const mod = await import(configURL.href);
   const options: Options = mod.options;
 
   if (!options) {
