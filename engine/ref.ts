@@ -72,9 +72,9 @@ export function serializeRefAnchor(anchor: RefAnchor): string {
   return "";
 }
 
-export function anchorToLinkSubpath(anchor: RefAnchor): string | null {
-  if (anchor.type === "header") return `#${anchor.name}`;
-  else if (anchor.type === "block") return `#^${anchor.name}`;
+export function anchorToLinkSubpath(anchor: RefAnchor): string {
+  if (anchor.type === "header") return `${anchor.name}`;
+  else if (anchor.type === "block") return `^${anchor.name}`;
   return "";
 }
 

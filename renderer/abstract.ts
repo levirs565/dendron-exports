@@ -3,7 +3,7 @@ import { RefNode } from "../markdown/mdast/ref.ts";
 import { WikiLinkNode } from "../markdown/mdast/wikilink.ts";
 import { resolveRefNodes } from "../markdown/refResolver.ts";
 import { Note } from "../engine/note.ts";
-import { parseRefSubpath } from "../engine/ref.ts";
+import { anchorToLinkSubpath, parseRefSubpath } from "../engine/ref.ts";
 import { Vault } from "../engine/vault.ts";
 import { parseLink } from "../engine/wikilink.ts";
 import { NotePathBuilder } from "../mod.ts";
@@ -84,11 +84,17 @@ export abstract class Renderer {
     const note = this.context.vault.tree.get(path);
     const context: RendererRefContext = {
       targetNote: note,
-      targetUrl: this.buildNoteUrl(note, path, subpath),
+      targetUrl: "",
       content: "",
     };
     if (note) {
-      const result = resolveRefNodes(parseRefSubpath(subpath), note.document);
+      const refSubpath = parseRefSubpath(subpath);
+      const result = resolveRefNodes(refSubpath, note.document);
+      context.targetUrl = this.buildNoteUrl(
+        note,
+        path,
+        refSubpath.start ? anchorToLinkSubpath(refSubpath.start) : ""
+      );
 
       if (result.state === "success")
         context.content = this.renderDocument(result.root);
