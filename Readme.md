@@ -66,6 +66,8 @@ export const options: Options = {
 };
 ```
 
+See [`Options` docs](https://deno.land/x/dendron_exports@v0.1.2/mod.ts?s=Options).
+
 Then run this command:
 
 ```sh
