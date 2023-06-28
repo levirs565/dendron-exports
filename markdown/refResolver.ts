@@ -17,17 +17,17 @@ type RefAnchorNode =
 
 function findHeaderNode(
   root: mdast.Root,
-  param: {
+  { name, minDepth }: {
     name?: string;
-    depth?: number;
+    minDepth?: number;
   },
   fromIndex = 0
 ): RefAnchorNode | null {
   const slugger = new GithubSlugger();
   let fn: (node: mdast.Heading) => boolean;
-  if (param.name)
-    fn = (node) => slugger.slug(mdast.toString(node)) === param.name;
-  else if (param.depth) fn = (node) => node.depth === param.depth;
+  if (name)
+    fn = (node) => slugger.slug(mdast.toString(node)) === name;
+  else if (minDepth) fn = (node) => node.depth <= minDepth;
   else fn = () => true;
   const index = root.children.findIndex(
     (node, index) => index >= fromIndex && node.type === "heading" && fn(node)
@@ -248,7 +248,7 @@ export function resolveRefNodes(
     endNode =
       findHeaderNode(
         newRoot,
-        { depth: (startNode.node as mdast.Heading).depth },
+        { minDepth: (startNode.node as mdast.Heading).depth },
         1
       ) ?? findEndNode(newRoot);
 

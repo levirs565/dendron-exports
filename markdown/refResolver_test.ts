@@ -107,6 +107,26 @@ Header 1.1 Content ^1f1egthix10t\n`
   );
 });
 
+Deno.test(
+  "resolve header ref when after it have header with lower level",
+  () => {
+    asserts.assertEquals(
+      getRef(dendronExample, {
+        start: {
+          type: "header",
+          name: "header-11",
+          lineOffset: 0,
+        },
+        text: "",
+      }),
+      `### Header 1.1
+
+Header 1.1 Content ^1f1egthix10t
+`
+    );
+  }
+);
+
 Deno.test("resolve header at end", () => {
   asserts.assertEquals(
     getRef(dendronExample, {
