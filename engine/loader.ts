@@ -1,6 +1,6 @@
 import { frontMatter, mdast, micromark, path, unist } from "../deps/mod.ts";
 import { Note } from "./note.ts";
-import { generateNoteId, getNoteTitle } from "./metadata.ts";
+import { getNoteTitle } from "./metadata.ts";
 import { wikiLinkMicromark } from "../markdown/micromark/wikilink.ts";
 import { refMicromark } from "../markdown/micromark/ref.ts";
 import {
@@ -47,7 +47,7 @@ export class Loader {
     }
 
     if (metadata.frontmatter.id) metadata.id = String(metadata.frontmatter.id);
-    else metadata.id = await generateNoteId(vault.config.name, note.getPath());
+
     metadata.title = getNoteTitle(note, metadata);
   }
 
