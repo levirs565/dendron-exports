@@ -148,6 +148,24 @@ Header 2.1 Content
   );
 });
 
+Deno.test("resolve header ref with 1 line offset", () => {
+  asserts.assertEquals(
+    getRef(dendronExample, {
+      start: {
+        type: "header",
+        name: "header-1",
+        lineOffset: 1,
+      },
+      text: "",
+    }),
+    `Header 1 Content
+
+### Header 1.1
+
+Header 1.1 Content ^1f1egthix10t\n`
+  );
+});
+
 Deno.test("resolve block ref", () => {
   asserts.assertEquals(
     getRef(dendronExample, {

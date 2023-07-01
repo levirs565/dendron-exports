@@ -17,7 +17,10 @@ type RefAnchorNode =
 
 function findHeaderNode(
   root: mdast.Root,
-  { name, minDepth }: {
+  {
+    name,
+    minDepth,
+  }: {
     name?: string;
     minDepth?: number;
   },
@@ -25,8 +28,7 @@ function findHeaderNode(
 ): RefAnchorNode | null {
   const slugger = new GithubSlugger();
   let fn: (node: mdast.Heading) => boolean;
-  if (name)
-    fn = (node) => slugger.slug(mdast.toString(node)) === name;
+  if (name) fn = (node) => slugger.slug(mdast.toString(node)) === name;
   else if (minDepth) fn = (node) => node.depth <= minDepth;
   else fn = () => true;
   const index = root.children.findIndex(
@@ -229,6 +231,10 @@ export function resolveRefNodes(
       state: "fail",
       message: `Start anchor ${serializeRefAnchor(start)} found`,
     };
+
+  if (start.type === "header" && start.lineOffset === 1) {
+    startNode.index++;
+  }
 
   const newRoot: mdast.Root = {
     type: "root",
