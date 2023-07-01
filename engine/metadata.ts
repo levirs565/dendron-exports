@@ -1,4 +1,4 @@
-import { path, stdCrypto } from "../deps/mod.ts";
+import { nanoid, path, stdCrypto } from "../deps/mod.ts";
 import { WikiLink } from "./wikilink.ts";
 import { Note } from "./note.ts";
 
@@ -76,3 +76,6 @@ export async function generateNoteId(vaultName: string, path: string) {
   const big = BigInt(`0x${hex}`);
   return big.toString(36).toLowerCase(); // 24 character long
 }
+
+const alphanumericLowercase = "0123456789abcdefghijklmnopqrstuvwxyz";
+export const generateUUID = nanoid.customAlphabet(alphanumericLowercase, 23);

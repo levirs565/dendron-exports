@@ -164,6 +164,7 @@
     "https://esm.sh/micromark@3.2.0/lib/parse.js": "ea2a8e5c48f3efd9c677d3169d60a4300195c4bc17c3b122bd6daffd72287937",
     "https://esm.sh/micromark@3.2.0/lib/postprocess.js": "fd1f0d0278d0fed5b0b2d0849592b31b95e13a2d6f813f92a6b0c8b9fad9cb05",
     "https://esm.sh/micromark@3.2.0/lib/preprocess.js": "f90bd8365e440cbaad22216eecb6a359c5466cb459511bf3b5f95cf7d43b075d",
+    "https://esm.sh/nanoid@4.0.2": "0bf1a03417b10bfa29a00ee3d2fdad5b8fd0164346903cb578d77243889ca617",
     "https://esm.sh/unist-util-visit-parents@5.1.3": "c5d6cbc95ec65fe504a9c475324b0f06a8d283314596eaf90b427ecb248c970a",
     "https://esm.sh/unist-util-visit@4.1.2": "2350e74a4a1e7ff1cc09b87560adea9f445a1d12a5d0a70212d60f96f1378430",
     "https://esm.sh/v126/@types/katex@0.16.0/index.d.ts": "d17f13839bd1f6bdfae4e09df4aac3ec6e99753b638af1e6e67a46c313d76f49",
@@ -258,7 +259,8 @@
     "https://esm.sh/v126/unist-util-visit@4.1.2/denonext/unist-util-visit.mjs": "880a7728c99ec460216c51bb6bc49b0ea02fe9cdf0ee34cb2d6dc4ec42cd452f",
     "https://esm.sh/v126/unist-util-visit@4.1.2/index.d.ts": "494240c69bd84a964aa105044e670144d26f733dd3a6ce25b60d64218319d6a5",
     "https://esm.sh/v126/unist-util-visit@4.1.2/lib/index.d.ts": "4036d692b14ac85f291627b4b0398c3c877678953d6ed856ca21bf97fb3efad5",
-    "https://esm.sh/v126/zwitch@2.0.4/denonext/zwitch.mjs": "c0e8c246a1f38b425335ea78cc366a7801d3ef89701229a35f85a51310e6e49f"
+    "https://esm.sh/v126/zwitch@2.0.4/denonext/zwitch.mjs": "c0e8c246a1f38b425335ea78cc366a7801d3ef89701229a35f85a51310e6e49f",
+    "https://esm.sh/v127/nanoid@4.0.2/denonext/nanoid.mjs": "b7a9ee0e56b1fd52dbfcff75b85571162317231ced5df882636df58e04c362eb"
   },
   "npm": {
     "specifiers": {

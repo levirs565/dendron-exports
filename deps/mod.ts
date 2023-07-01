@@ -13,3 +13,5 @@ export * as mdast from "./mdast.ts";
 export * as unist from "./unist.ts";
 
 export * as cliffy from "https://deno.land/x/cliffy@v0.25.7/command/mod.ts";
+
+export * as nanoid from "https://esm.sh/nanoid@4.0.2";
