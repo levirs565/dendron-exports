@@ -8,6 +8,7 @@ import { Vault } from "../engine/vault.ts";
 import { parseLink } from "../engine/wikilink.ts";
 import { NotePathBuilder } from "../mod.ts";
 import { BlockAnchorNode } from "../markdown/mdast/blockAnchor.ts";
+import { makeRawContent } from "../engine/utils.ts";
 
 export interface RendererContext {
   vault: Vault;
@@ -49,11 +50,10 @@ export abstract class Renderer {
   }
 
   renderNote(note: Note) {
-    const frontmatter = `---\n${yaml.stringify(
-      this.processFrontmatter(note)
-    )}---`;
-    const content = this.renderDocument(note.document);
-    return `${frontmatter}\n\n${content}`;
+    return makeRawContent(
+      this.processFrontmatter(note),
+      this.renderDocument(note.document)
+    );
   }
 
   protected buildNoteUrl(
