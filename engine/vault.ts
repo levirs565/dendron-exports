@@ -1,5 +1,6 @@
 import { path } from "../deps/mod.ts";
 import { NoteTree } from "./tree.ts";
+import { parseLink } from "./wikilink.ts";
 
 export interface VaultConfig {
   path: string;
@@ -29,7 +30,8 @@ export class Vault {
   buildBacklinks() {
     for (const note of this.tree.walk()) {
       for (const link of note.metadata.links) {
-        const target = this.tree.get(link.target);
+        const { path } = parseLink(link.target);
+        const target = this.tree.get(path);
         if (!target) continue;
 
         target.metadata.backlinks.push(note);
