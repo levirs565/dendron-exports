@@ -42,10 +42,17 @@ export abstract class Renderer {
 
   processFrontmatter(note: Note): Record<string, unknown> {
     const { id, title, ...rest } = note.metadata.frontmatter;
+    const supernotes = note.getPathNotes();
+
+    supernotes.pop();
+    if (supernotes.length > 0 && supernotes[0].name === "root")
+      supernotes.shift();
+
     return {
       id: note.metadata.id,
       title: note.metadata.title,
       subnotes: note.children.map((child) => child.metadata.id),
+      supernotes: supernotes.map((sup) => sup.metadata.id),
       backlinks: note.metadata.backlinks.map((child) => child.metadata.id),
       ...rest,
     };
