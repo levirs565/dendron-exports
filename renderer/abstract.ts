@@ -41,11 +41,13 @@ export abstract class Renderer {
   }
 
   processFrontmatter(note: Note): Record<string, unknown> {
+    const { id, title, ...rest } = note.metadata.frontmatter;
     return {
       id: note.metadata.id,
       title: note.metadata.title,
       subnotes: note.children.map((child) => child.metadata.id),
       backlinks: note.metadata.backlinks.map((child) => child.metadata.id),
+      ...rest,
     };
   }
 
